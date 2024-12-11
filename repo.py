@@ -97,23 +97,72 @@
 # |            godkänd):     |
 # ---------------------------
 
-class Bil:
-    antalBilar = 0
+# class Bil:
+#     antalBilar = 0
 
-    def __init__(self, maxHastighet):
-        self.__maxHastighet = maxHastighet
-        Bil.antalBilar += 1
+#     def __init__(self, maxHastighet):
+#         self.__maxHastighet = maxHastighet
+#         Bil.antalBilar += 1
 
-    def get_maxHastighet(self):
-        return self.__maxHastighet
+#     def get_maxHastighet(self):
+#         return self.__maxHastighet
 
 
-bil1 = Bil(180)
-bil2 = Bil(220)
-bil3 = Bil(230)
+# bil1 = Bil(180)
+# bil2 = Bil(220)
+# bil3 = Bil(230)
 
-print(f"Bil 1 MaxHastighet: {bil1.get_maxHastighet()} km/h")
-print(f"Bil 2 MaxHastighet: {bil2.get_maxHastighet()} km/h")
-print(f"Bil 3 MaxHastighet: {bil3.get_maxHastighet()} km/h")
+# print(f"Bil 1 MaxHastighet: {bil1.get_maxHastighet()} km/h")
+# print(f"Bil 2 MaxHastighet: {bil2.get_maxHastighet()} km/h")
+# print(f"Bil 3 MaxHastighet: {bil3.get_maxHastighet()} km/h")
 
-print(f"Antal skapade bilar: {Bil.antalBilar}")
+# print(f"Antal skapade bilar: {Bil.antalBilar}")
+
+
+# class Media:
+#     def __init__(self, titel):
+#         self.titel = titel
+
+
+# class Bok(Media):
+#     def __init__(self, titel, antal_sidor):
+#         super().__init__(titel)
+#         self.antal_sidor = antal_sidor
+
+
+# class Ljudspår(Media):
+#     def __init__(self, titel, speltid):
+#         super().__init__(titel)
+#         self.speltid = speltid
+
+
+# class Film(Ljudspår):
+#     def __init__(self, titel, speltid, upplösning):
+#         super().__init__(titel, speltid)
+#         self.upplösning = upplösning
+
+
+# b = Bok("Bröderna Karamazov", 840)
+# print(b.titel)
+# print(b.antal_sidor)
+
+# if isinstance(b, Media) and isinstance(b, Bok):
+#     print("b är samtidigt av typen Media och Bok")
+
+# f = Film("De sju samurajerna", "3:27:02", "1080")
+# print(f.titel)
+# print(f.speltid)
+# print(f.upplösning)
+
+# if isinstance(f, Media) and isinstance(f, Ljudspår) and isinstance(f, Film):
+#     print("f är samtidigt av typen Media, Ljudspår och Film")
+
+# l = Ljudspår("beat it", "3:45")
+# print(l.titel)
+# print(l.speltid)
+
+# if isinstance(l, Media) and isinstance(l, Ljudspår):
+#     print("l är samtidigt av typen Media, bok och Ljudspår")
+
+def click_handler(self):
+    print("Button clicked")
