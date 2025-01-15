@@ -29,6 +29,38 @@ class PongGame:
         )
         self.start_button.pack(pady=10)
 
+        self.exit_button = tk.Button(
+            self.root, text="Avsluta", font=("Arial", 18), command=self.root.quit
+        )
+        self.exit_button.pack(pady=10)
+
+    def start_game(self):
+        # Starta Pong spelet
+        self.clear_screen()
+
+        self.canvas = tk.Canvas(
+            self.root, width=self.WIDTH, height=self.HEIGHT, bg="black")
+        self.canvas.pack()
+
+        # lägg till paddlar och boll.
+        self.left_paddle = self.canvas.create_rectangle(
+            20, self.HEIGHT // 2 - self.PADDLE_HEIGHT // 2,
+            20 + self.PADDLE_WIDTH, self.HEIGHT // 2 + self.PADDLE_HEIGHT // 2,
+            fill="white"
+        )
+
+        self.right_paddle = self.canvas.create_rectangle(
+            self.WIDTH - 20 - self.PADDLE_WIDTH, self.HEIGHT // 2 - self.PADDLE_HEIGHT // 2,
+            self.WIDTH - 20, self.HEIGHT // 2 + self.PADDLE_HEIGHT // 2,
+            fill="white"
+        )
+
+        self.ball = self.canvas.create_oval(
+            self.WIDTH // 2 - 10, self.HEIGHT // 2 - 10,
+            self.WIDTH // 2 + 10, self.HEIGHT // 2 + 10,
+            fill="red"
+        )
+
     def clear_screen(self):
         for widget in self.root.winfo_children():
             widget.destroy()
