@@ -1,39 +1,51 @@
-from socket import *
+import socket
 import threading
 
-Host = "0,0,0,0"
-port = 3000
-ADDR = (Host, port)
-
-server = socket(AF_INET, SOCK_STREAM)
-server.bind(ADDR)
-server.listen(2)
-
-print("servern är startad på {Host}:{port}")
-
-board = [""] * 9
-players = {}
-current_turn = "X"
+HOST = '127.0.0.1'
+PORT = 3333
 
 
-def send_board():
-    board_state = ",".join(board)
-    for player in players.values():
-        player.sendall(board_state.encode())
+clients = []
+player_symbols = ["X", "O"]
+current_turn = 0
 
 
-def check_winner():
-    win_conditions = [
-        (0, 1, 2), (3, 4, 5), (6, 7, 8),  # Rader
-        (0, 3, 6), (1, 4, 7), (2, 5, 8),  # Kolumner
-        (0, 4, 8), (2, 4, 6)  # Diagonaler
-    ]
-    for a, b, c in win_conditions:
-        if board[a] == board[b] == board[c] and board[a] != "":
-            return board[a]
-        return None
-
-
-def handle_client(conn, symbol):
+def handle_client(client, player_id):
     global current_turn
-    conn.sendall(f"Du är {symbol}".encode())
+    client.send(player_symbols[player_id].encode())
+
+    while True:
+        try:
+            move = client.recv(1024).decode()
+            if not move:
+                break
+
+            other_player = clients[1 - player_id]
+            other_player.send(move.encode())
+            current_turn = 1 - current_turn
+        except:
+            break
+
+    client.close()
+    clients.remove(client)
+
+
+def start_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((HOST, PORT))
+    server.listen(2)
+    print("Servern väntar för spelare...")
+
+    while len(clients) < 2:
+        client, addr = server.accept()
+        print(f"Spelare {len(clients) + 1} Annslöt från {addr}")
+        clients.append(client)
+
+        player_id = len(clients) - 1
+        threading.Thread(target=handle_client,
+                         args=(client, player_id)).start()
+
+    print("Spelet börjar...")
+
+
+start_server()
