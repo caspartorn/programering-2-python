@@ -1,7 +1,7 @@
 import socket
 import threading
 
-HOST = '127.0.0.1'
+HOST = '192.168.1.174'  # OBS KOM IHÅG ATT BYTA TILL DITT NÄTVERK
 PORT = 3333
 
 
