@@ -20,7 +20,7 @@ class TicTacToeClient:
         # coonectar till server
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # OBS KOM IHÅG ATT BYTA TILL DITT NÄTVERK
-        self.client.connect(('10.32.41.176', 3333))
+        self.client.connect(('192.168.1.174', 3333))
 
         # Tar emot spelarens symbol från servern (X eller O)
         self.symbol = self.client.recv(1024).decode()
