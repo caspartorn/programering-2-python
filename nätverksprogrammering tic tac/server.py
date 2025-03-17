@@ -1,7 +1,7 @@
 import socket
 import threading
 
-HOST = '192.168.1.174'  # OBS KOM IHÅG ATT BYTA TILL DITT NÄTVERK
+HOST = '10.32.41.176'
 PORT = 3333
 
 # 10.32.41.176
@@ -10,18 +10,18 @@ clients = []
 player_symbols = ["X", "O"]
 current_turn = 0
 board = [""] * 9
+lock = threading.Lock()
 
 
 def check_winner():
-    winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8),  # Rader
-                            (0, 3, 6), (1, 4, 7), (2, 5, 8),  # Kolumner
-                            (0, 4, 8), (2, 4, 6)              # Diagonaler
-                            ]
+    winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
+                            (0, 3, 6), (1, 4, 7), (2, 5, 8),
+                            (0, 4, 8), (2, 4, 6)]
     for (a, b, c) in winning_combinations:
         if board[a] == board[b] == board[c] and board[a] != "":
             return board[a]
-        if "" not in board:
-            return "draw"
+    if "" not in board:
+        return "draw"
     return None
 
 
@@ -36,29 +36,38 @@ def handle_client(client, player_id):
                 break
 
             move = int(move)
-            board[move] = player_symbols[player_id]
+            if move < 0 or move >= 9 or board[move] != "":
+                client.send("Ogiltigt drag. Försök igen.".encode())
+                continue
+
+            with lock:
+                board[move] = player_symbols[player_id]
 
             winner = check_winner()
             if winner:
                 for c in clients:
-                    c.send("win".encode())  # Skickar vem som vann
+                    if winner == "draw":
+                        c.send("Spelet är oavgjort.".encode())
+                    else:
+                        c.send(f"{winner} vann!".encode())
                 reset_game()
                 continue
 
             other_player = clients[1 - player_id]
-            other_player.send(move.encode())
+            other_player.send(str(move).encode())
             current_turn = 1 - current_turn
-        except:
+        except (socket.error, ConnectionResetError):
             break
 
+    with lock:
+        clients.remove(client)
     client.close()
-    clients.remove(client)
 
 
 def reset_game():
     global board, current_turn
-    board = [""] * 9  # Återställ brädet
-    current_turn = 0  # Sätt X som första spelare
+    board = [""] * 9
+    current_turn = 0
 
 
 def start_server():
@@ -69,7 +78,7 @@ def start_server():
 
     while len(clients) < 2:
         client, addr = server.accept()
-        print(f"Spelare {len(clients) + 1} Annslöt från {addr}")
+        print(f"Spelare {len(clients) + 1} anslöt från {addr}")
         clients.append(client)
 
         player_id = len(clients) - 1
