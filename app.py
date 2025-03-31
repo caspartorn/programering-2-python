@@ -6,6 +6,8 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Connecta till MySQL-databasen
+
+
 def get_db_connection():
     connection = mysql.connector.connect(
         host='localhost',
@@ -14,6 +16,7 @@ def get_db_connection():
         database='forum_db'
     )
     return connection
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -28,14 +31,16 @@ def signup():
         user = cursor.fetchone()
         if user:
             return "Username already taken, please choose another one."
-        
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
         conn.commit()
         conn.close()
 
         return redirect(url_for('login'))
-    
+
     return render_template('signup.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,9 +55,41 @@ def login():
         conn.close()
 
         if user and check_password_hash(user[2], password):
-            session['user_id'] = user[0]  # Store user id in session
+            session['user_id'] = user[0]  # Spara användarens id i sessionen
             return redirect(url_for('forum'))
         else:
-            return "Invalid credentials. Please try again."
-    
+            return "Invalid user. Please try again."
+
     return render_template('login.html')
+
+
+@app.route('/forum', methods=['GET', 'POST'])
+def forum():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM posts ORDER BY created_at DESC")
+    posts = cursor.fetchall()
+
+    if request.method == 'POST':
+        content = request.form['content']
+        user_id = session['user_id']
+        cursor.execute(
+            "INSERT INTO posts (user_id, content) VALUES (%s, %s)", (user_id, content))
+        conn.commit()
+
+    conn.close()
+    return render_template('forum.html', posts=posts)
+
+
+@app.route('/get_posts', methods=['GET'])
+def get_posts():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM posts ORDER BY created_at DESC")
+    posts = cursor.fetchall()
+    conn.close()
+
+    return jsonify(posts)
