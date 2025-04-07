@@ -24,6 +24,14 @@
       {% endfor %}
     </ul>
 
+    <form
+      action="/delete_all_posts"
+      method="POST"
+      onsubmit="return confirm('Are you sure you want to remove all posts?');"
+    >
+      <button type="submit" class="delete-button">Delete all posts</button>
+    </form>
+
     <script>
       //skicka inläggsformulär asynkront med ajax
       document

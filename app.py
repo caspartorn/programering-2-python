@@ -106,5 +106,18 @@ def home():
     return redirect(url_for('login'))
 
 
+@app.route('/delete_all_posts', methods=['POST'])
+def delete_all_posts():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM posts")
+    conn.commit()
+    conn.close()
+    return redirect(url_for('forum'))
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3333, debug=True)
