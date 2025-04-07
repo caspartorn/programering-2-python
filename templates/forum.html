@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <h1>Welcome to the Forum</h1>
+    <a href="/logout">Logout</a>
+
+    <h2>Post Something:</h2>
+    <form id="postForm" action="/forum" method="POST">
+      <textarea id="content" name="content" required></textarea>
+      <button type="submit">Post</button>
+    </form>
+
+    <h2>All Posts:</h2>
+    <ul id="posts-list">
+      {% for post in posts %}
+      <li id="post-{{ post[0] }}">{{ post[3] }}: {{ post[2] }}</li>
+      {% endfor %}
+    </ul>
+
+    <script>
+      //skicka inläggsformulär asynkront med ajax
+      document
+        .getElementById("postForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Förhindra standardformulärs beteende
+          var content = document.getElementById("content").value;
+
+          fetch("/forum", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: "content=" + encodeURIComponent(content),
+          })
+            .then((response) => {
+              return response.text();
+            })
+            .then((data) => {
+              //Efter post, ta bort inlägget och ladda om inläggen
+              document.getElementById("content").value = "";
+              loadPosts(); // refresha inläggen
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+      //funktionen laddar inlägg från servern och uppdaterar listan med inlägg
+      function loadPosts() {
+        fetch("/get_posts")
+          .then((response) => response.json())
+          .then((posts) => {
+            const postsList = document.getElementById("posts-list");
+            postsList.innerHTML = ""; // ta bort gamla inlägg
+
+            posts.forEach((post) => {
+              const postElement = document.createElement("li");
+              postElement.textContent = `${post[3]}: ${post[2]}`; //datum och innehåll
+              postsList.appendChild(postElement);
+            });
+          })
+          .catch((error) => console.error("Error loading posts:", error));
+      }
+      // sätt upp polling för att ladda inlägg varannan sekund
+      setInterval(loadPosts, 2000);
+    </script>
+  </body>
+</html>
