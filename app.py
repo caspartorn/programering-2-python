@@ -93,3 +93,13 @@ def get_posts():
     conn.close()
 
     return jsonify(posts)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3333, debug=True)
